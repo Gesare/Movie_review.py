@@ -1,14 +1,17 @@
 import unittest
-from app.models import Review
+from app.models import Review,User
+from app import db
 
 class TestReview(unittest.TestCase):
 
     def setUp(self):
-        self.new_review = Review(12345,'Review for movies',"https://image.tmdb.org/t/p/w500/jdjdjdjn",'This movie is the best thing since sliced bread')
+        self.user_gesare = User(username = 'gesare',password = 'ombati', email = 'gesare@ms.com')
+        self.new_review = Review(movie_id=12345,movie_title='Review for movies',image_path="https://image.tmdb.org/t/p/w500/jdjdjdjn",movie_review='This movie is the best thing since sliced bread',user = self.user_gesare )
 
 
     def tearDown(self):
-        Review.clear_reviews()
+        Review.query.delete()
+        User.query.delete()
 
     def test_instance(self):
         self.assertTrue(isinstance(self.new_review,Review))
@@ -19,11 +22,11 @@ class TestReview(unittest.TestCase):
         self.assertEquals(self.new_review.title,'Review for movies')
         self.assertEquals(self.new_review.imageurl,"https://image.tmdb.org/t/p/w500/jdjdjdjn")
         self.assertEquals(self.new_review.review,'This movie is the best thing since sliced bread')
-
+        self.assertEquals(self.new_review.user,self.user_gesare)
 
     def test_save_review(self):
         self.new_review.save_review()
-        self.assertTrue(len(Review.all_reviews)>0)
+        self.assertTrue(len(Review.query.all())>0)
 
 
     def test_get_review_by_id(self):
